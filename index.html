@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qwen Chatbot</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 16px; }
+    #chat { border: 1px solid #ccc; border-radius: 8px; padding: 12px; height: 60vh; overflow-y: auto; margin-bottom: 12px; }
+    .user { color: #0070f3; margin: 8px 0; }
+    .assistant { color: #111; margin: 8px 0; }
+    input { width: 75%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Qwen Chatbot</h2>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Type a message..." />
+  <button onclick="send()">Send</button>
+
+  <script>
+    const chat = document.getElementById('chat');
+    let history = [];
+
+    async function send() {
+      const input = document.getElementById('msg');
+      const text = input.value.trim();
+      if (!text) return;
+
+      chat.innerHTML += `<div class="user"><b>You:</b> ${text}</div>`;
+      input.value = '';
+      chat.scrollTop = chat.scrollHeight;
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history })
+      });
+      const data = await res.json();
+
+      chat.innerHTML += `<div class="assistant"><b>Qwen:</b> ${data.response}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+      history.push([text, data.response]);
+    }
+  </script>
+</body>
+</html>
